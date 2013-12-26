@@ -2,7 +2,7 @@
 set -e
 set -u
 name=kafka
-version=0.7.2-incubating
+version=0.8.0-beta1
 description="Apache Kafka is a distributed publish-subscribe messaging system."
 url="https://kafka.apache.org/"
 arch="all"
@@ -10,7 +10,8 @@ section="misc"
 license="Apache Software License 2.0"
 package_version="-1"
 src_package="kafka-${version}-src.tgz"
-download_url="http://mirrors.sonic.net/apache/incubator/kafka/kafka-${version}/${src_package}"
+#download_url="http://mirrors.sonic.net/apache/incubator/kafka/kafka-${version}/${src_package}"
+download_url="https://dist.apache.org/repos/dist/release/kafka/kafka-0.8.0-beta1-src.tgz"
 origdir="$(pwd)"
 
 #_ MAIN _#
@@ -34,10 +35,11 @@ cp ${origdir}/kafka-broker.upstart.conf build/etc/init/kafka-broker.conf
 tar zxf ${origdir}/${src_package}
 cd kafka-${version}-src
 ./sbt update
-./sbt package
+./sbt "++2.9.2 release-zip"
 mv config/log4j.properties config/server.properties ../build/etc/kafka
-mv * ../build/usr/lib/kafka
+mv target/RELEASE/kafka_2.9.2-0.8.0-beta1/* ../build/usr/lib/kafka
 cd ../build
+chmod 755 usr/lib/kafka/bin/*.sh
 
 fpm -t deb \
     -n ${name} \
